@@ -3,248 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bar Master Interview Quiz</title>
+    <title>Bar Master Interview Quiz (Final)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        gold: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        },
-                        dark: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
+                        gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
+                        dark: { 800: '#1e293b', 900: '#0f172a' }
                     },
                     fontFamily: {
                         'serif': ['Playfair Display', 'serif'],
                         'sans': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
                     }
                 }
             }
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
     <style>
         body { font-family: 'Inter', sans-serif; }
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Confetti effect class */
+        .confetti {
+            position: absolute;
+            width: 10px; height: 10px;
+            background-color: #f59e0b;
+            animation: confetti-fall 3s linear infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(800px) rotate(720deg); opacity: 0; }
+        }
     </style>
 </head>
-<body class="bg-dark-900 text-slate-200 min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-fixed">
+<body class="bg-dark-900 text-slate-200 min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-fixed overflow-hidden">
 
-    <div class="absolute inset-0 bg-black/70 z-0"></div>
+    <div class="absolute inset-0 bg-black/80 z-0"></div>
 
-    <div class="relative z-10 w-full max-w-2xl bg-dark-800/90 backdrop-blur-md border border-slate-700 rounded-3xl shadow-2xl overflow-hidden p-8 md:p-12 fade-in">
+    <div id="confetti-container" class="absolute inset-0 pointer-events-none hidden z-20"></div>
+
+    <div class="relative z-10 w-full max-w-2xl bg-dark-800/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden p-6 md:p-10 fade-in flex flex-col min-h-[600px]">
         
-        <div class="text-center mb-8 border-b border-slate-600 pb-6">
-            <p class="text-gold-500 text-sm tracking-widest uppercase mb-2">5-Star Hotel Standards</p>
-            <h1 class="text-3xl md:text-4xl font-bold text-white tracking-wide font-serif">Bar Master Challenge</h1>
+        <div class="text-center mb-6 border-b border-slate-600 pb-4 shrink-0">
+            <p class="text-gold-500 text-xs md:text-sm tracking-[0.2em] uppercase mb-2">Exclusive Recruitment</p>
+            <h1 class="text-2xl md:text-4xl font-bold text-white tracking-wide font-serif">Professional Bar Quiz</h1>
         </div>
 
-        <div id="start-screen" class="text-center space-y-6">
-            <p class="text-lg text-slate-300 leading-relaxed">
-                แบบทดสอบวัดความรู้พื้นฐาน Cocktail Product Knowledge <br> 
-                และทักษะการแก้ปัญหาหน้างาน (Service Mind)
-            </p>
-            <div class="py-4">
-                <span class="inline-block bg-slate-700/50 rounded-lg px-6 py-3 border border-slate-600">
-                    <span class="text-gold-400 font-bold text-xl">8</span> ข้อ | <span class="text-gold-400 font-bold text-xl">100%</span> คะแนนเต็ม
-                </span>
+        <div id="start-screen" class="flex-grow flex flex-col justify-center items-center text-center space-y-8">
+            <div class="space-y-4">
+                <p class="text-lg text-slate-300">
+                    แบบทดสอบวัดระดับ Bar & Service Standards <br>
+                    เพื่อคัดเลือกพนักงานเข้าสู่ทีมระดับ 5 ดาว
+                </p>
+                <div class="flex justify-center gap-4">
+                    <div class="px-4 py-2 bg-slate-700 rounded-lg border border-slate-600">
+                        <span class="block text-2xl font-bold text-gold-400">15</span>
+                        <span class="text-xs text-slate-400">Questions</span>
+                    </div>
+                    <div class="px-4 py-2 bg-slate-700 rounded-lg border border-slate-600">
+                        <span class="block text-2xl font-bold text-gold-400">Hard</span>
+                        <span class="text-xs text-slate-400">Difficulty</span>
+                    </div>
+                </div>
             </div>
-            <button onclick="startQuiz()" class="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-dark-900 font-bold rounded-full transition-all transform hover:scale-105 shadow-lg text-lg">
-                เริ่มทำแบบทดสอบ
+            <button onclick="startQuiz()" class="w-full md:w-2/3 py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-dark-900 font-bold rounded-xl shadow-lg transition-transform transform hover:scale-105">
+                Start Interview Test
             </button>
         </div>
 
-        <div id="quiz-screen" class="hidden">
-            <div class="w-full bg-slate-700 rounded-full h-2.5 mb-6">
-                <div id="progress-bar" class="bg-gold-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div id="quiz-screen" class="hidden flex flex-col h-full">
+            <div class="w-full bg-slate-700 rounded-full h-1.5 mb-6 shrink-0">
+                <div id="progress-bar" class="bg-gold-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
 
-            <div class="mb-8">
-                <p id="question-number" class="text-gold-500 text-sm font-semibold mb-2">Question 1/8</p>
-                <h2 id="question-text" class="text-2xl font-serif text-white font-medium leading-normal h-auto min-h-[4rem]">
-                    </h2>
+            <div class="mb-6 shrink-0">
+                <div class="flex justify-between items-end mb-2">
+                    <span id="question-number" class="text-gold-500 text-sm font-semibold">Q1</span>
+                    <span id="score-display" class="text-slate-500 text-xs">Score: 0</span>
+                </div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-serif text-white leading-relaxed">Loading...</h2>
             </div>
 
-            <div id="options-container" class="grid gap-4 md:grid-cols-1">
+            <div id="options-container" class="grid gap-3 overflow-y-auto pr-1 pb-2 grow content-start">
                 </div>
 
-            <button id="next-btn" onclick="nextQuestion()" class="hidden w-full mt-8 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-xl transition-colors">
-                ข้อถัดไป &rarr;
+            <button id="next-btn" onclick="nextQuestion()" class="hidden w-full mt-4 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-xl transition-colors shrink-0">
+                Next Question &rarr;
             </button>
         </div>
 
-        <div id="result-screen" class="hidden text-center fade-in">
-            <div class="mb-6">
-                <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-slate-700 border-4 border-gold-500 text-gold-500 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h2 class="text-3xl font-serif text-white mb-2">บทสรุปการสัมภาษณ์</h2>
-                <p class="text-slate-400">คะแนนของคุณ</p>
-            </div>
+        <div id="result-screen" class="hidden flex-grow flex flex-col justify-center items-center text-center fade-in">
+            <div id="result-icon" class="mb-6 mx-auto transition-all duration-500"></div>
             
-            <div class="text-5xl font-bold text-gold-500 mb-6" id="final-score">0/8</div>
-            <p id="feedback-text" class="text-lg text-white mb-8 px-4 leading-relaxed"></p>
+            <h2 id="result-title" class="text-3xl font-serif text-white mb-2">Interview Result</h2>
+            <div class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-gold-400 to-gold-600 mb-4" id="final-score">0/15</div>
+            
+            <div id="feedback-box" class="p-6 rounded-2xl mb-8 max-w-md mx-auto leading-relaxed border border-transparent transition-all">
+                <div id="feedback-text" class="text-slate-300"></div>
+            </div>
 
-            <button onclick="location.reload()" class="px-8 py-3 border border-gold-500 text-gold-400 hover:bg-gold-500 hover:text-dark-900 rounded-full transition-all font-semibold">
-                เริ่มทำใหม่
+            <button onclick="location.reload()" id="action-btn" class="px-8 py-3 border border-slate-500 hover:border-gold-500 text-slate-300 hover:text-white rounded-full transition-all">
+                Retake Quiz
             </button>
         </div>
     </div>
 
     <script>
-        // ข้อมูลคำถาม (สามารถแก้ไขเพิ่มลดได้ที่นี่)
         const questions = [
+            // --- Product Knowledge: Cocktails ---
             {
-                question: "จากรายการในภาพ ค็อกเทล 'Mojito' ใช้เหล้าชนิดใดเป็น Base Spirit?",
-                options: ["Vodka", "Gin", "Rum", "Tequila"],
-                correct: 2 // Index ของคำตอบที่ถูกต้อง (เริ่มที่ 0)
+                q: "1. 'Mojito' มีต้นกำเนิดจากคิวบา ส่วนผสมหลักคือเหล้าชนิดใด?",
+                opts: ["Vodka", "Gin", "Rum", "Tequila"],
+                a: 2 // Rum
             },
             {
-                question: "'Margarita' เป็นค็อกเทลที่มีชื่อเสียงมาก โดยมีส่วนผสมหลักคืออะไร?",
-                options: ["Tequila", "Rum", "Whisky", "Brandy"],
-                correct: 0
+                q: "2. 'Margarita' ต้องเสิร์ฟโดยมีการทำ Rim (เคลือบขอบแก้ว) ด้วยอะไร?",
+                opts: ["น้ำตาลทราย", "เกลือ", "ผงโกโก้", "พริกเกลือ"],
+                a: 1 // Salt
             },
             {
-                question: "ค็อกเทลแก้วใดในรายการนี้ ที่นิยมใช้วิธีการ 'Stir' (คน) แทนการเขย่า เพื่อความใสของเครื่องดื่ม?",
-                options: ["Mojito", "Pina Colada", "Martini", "Bloody Mary"],
-                correct: 2
+                q: "3. 'Cosmopolitan' เป็นค็อกเทลสีชมพูสวยงาม เกิดจากส่วนผสมของ Vodka กับน้ำผลไม้อะไร?",
+                opts: ["น้ำส้ม (Orange)", "น้ำแครนเบอร์รี่ (Cranberry)", "น้ำทับทิม (Pomegranate)", "น้ำสตรอว์เบอร์รี่ (Strawberry)"],
+                a: 1 // Cranberry
             },
             {
-                question: "Long Island Iced Tea มีความพิเศษที่แตกต่างจากแก้วอื่นในลิสต์อย่างไร?",
-                options: ["ใช้ชาเป็นส่วนผสมหลัก", "ใช้เหล้า Base Spirit ผสมกันถึง 4-5 ชนิด", "ไม่มีแอลกอฮอล์", "ต้องเสิร์ฟร้อนเท่านั้น"],
-                correct: 1
+                q: "4. 'Piña Colada' (พีน่า โคลาด้า) ให้รสชาติแบบ Tropical ส่วนผสมหลักคือ Rum, กะทิ และ...?",
+                opts: ["น้ำสับปะรด", "น้ำมะนาว", "น้ำเชื่อมกลิ่นส้ม", "โซดา"],
+                a: 0 // Pineapple Juice
             },
             {
-                question: "ส่วนผสมหลักของ 'Cosmopolitan' คืออะไร?",
-                options: ["Gin + Lime", "Whisky + Bitters", "Vodka + Cranberry", "Rum + Cola"],
-                correct: 2
+                q: "5. 'Bloody Mary' เป็นค็อกเทลแนว Savory (คาว) มักใช้อะไรเป็นตัวชูรสชาติ?",
+                opts: ["น้ำเชื่อม", "นมสด", "ซอสทาบาสโก้ และ วูสเตอร์ซอส", "น้ำผึ้ง"],
+                a: 2 // Tabasco/Worcestershire
             },
             {
-                question: "หากลูกค้าสั่ง 'Old Fashioned' ในบาร์ระดับ 5 ดาว ข้อใดแสดงถึงความใส่ใจได้ดีที่สุด?",
-                options: ["รีบทำมาเสิร์ฟให้เร็วที่สุด", "ใช้ก้อนน้ำแข็งขนาดใหญ่ (Ice Ball) และฝานเปลือกส้มต่อหน้า", "ใส่น้ำเชื่อมเยอะๆ เพื่อให้ดื่มง่าย", "แนะนำให้ดื่มเบียร์แทน"],
-                correct: 1
+                q: "6. 'Long Island Iced Tea' ขึ้นชื่อเรื่องความแรง เพราะใช้ Base Spirit ถึงกี่ชนิดรวมกัน?",
+                opts: ["2 ชนิด", "3 ชนิด", "4-5 ชนิด", "ชนิดเดียวแต่ใส่เยอะ"],
+                a: 2 // 4-5 spirits
+            },
+            
+            // --- Product Knowledge: Spirits (Base & Liqueur) ---
+            {
+                q: "7. 'Gin' (จิน) มีกลิ่นหอมเอกลักษณ์เฉพาะตัว กลิ่นนั้นมาจากผลของพืชชนิดใด?",
+                opts: ["องุ่น (Grape)", "จูนิเปอร์เบอร์รี่ (Juniper Berry)", "ข้าวบาร์เลย์ (Barley)", "อ้อย (Sugarcane)"],
+                a: 1 // Juniper
             },
             {
-                question: "Liqueur (ลิเคียว) แตกต่างจาก Base Spirit (เช่น Vodka, Rum) อย่างไร?",
-                options: ["Liqueur มีแอลกอฮอล์สูงกว่า", "Liqueur คือเหล้าหวานที่มีการแต่งกลิ่นและรส", "ไม่มีข้อแตกต่าง", "Liqueur ใช้หมักจากข้าวเท่านั้น"],
-                correct: 1
+                q: "8. 'Brandy' (บรั่นดี) มักทำมาจากการหมักและกลั่นผลไม้อะไรเป็นหลัก?",
+                opts: ["ข้าวเจ้า", "มันฝรั่ง", "องุ่น", "ข้าวโพด"],
+                a: 2 // Grapes
             },
             {
-                question: "Service Case: ลูกค้าบ่นว่า Martini รสชาติ 'อ่อนเกินไป' คุณควรทำอย่างไร?",
-                options: ["เถียงลูกค้าว่าตวงมาเป๊ะแล้ว", "แอบเติมเหล้าเพิ่มให้ทีหลัง", "ขอโทษ และเสนอทำแก้วใหม่พร้อมสอบถามความชอบ (Dry/Extra Dry)", "บอกให้ลูกค้ารอน้ำแข็งละลาย"],
-                correct: 2
+                q: "9. ในภาพมีคำว่า 'Liqueur' (ลิเคียว) สิ่งนี้คืออะไร?",
+                opts: ["เหล้ากลั่นบริสุทธิ์ ดีกรีสูง", "เหล้าหวาน ที่มีการแต่งกลิ่น สี และรสชาติ", "ไวน์ชนิดหนึ่ง", "ชื่อยี่ห้อเหล้า"],
+                a: 1 // Sweetened spirits
+            },
+            {
+                q: "10. หากลูกค้าสั่ง 'Old Fashioned' เหล้า Base Spirit ที่ถูกต้องตามต้นตำรับคืออะไร?",
+                opts: ["Vodka", "Gin", "Whisky / Bourbon", "Rum"],
+                a: 2 // Whisky
+            },
+
+            // --- 5-Star Service Standards & Skill ---
+            {
+                q: "11. 'Martini' โดยปกติแล้วต้องใช้วิธี Stir (คน) เหตุผลหลักคืออะไร?",
+                opts: ["เพื่อให้เย็นเร็วที่สุด", "เพื่อให้ได้ฟองนุ่มๆ", "เพื่อให้เครื่องดื่มใสดุจคริสตัล (Crystal Clear)", "เพื่อให้น้ำแข็งละลายเยอะๆ"],
+                a: 2 // Clarity
+            },
+            {
+                q: "12. ลูกค้าสั่ง 'Whisky On the Rocks' มาตรฐานโรงแรม 5 ดาว ควรเสิร์ฟอย่างไร?",
+                opts: ["ใส่น้ำแข็งป่นให้เต็มแก้ว", "ใส่น้ำแข็งก้อนใหญ่ (Ice Ball/Cube) ก้อนเดียว", "ใส่น้ำแข็งหลอด", "ไม่ต้องใส่น้ำแข็ง เสิร์ฟแยก"],
+                a: 1 // Ice Ball
+            },
+            {
+                q: "13. หากลูกค้าเริ่มเมาและสั่งเครื่องดื่มเพิ่ม ในฐานะ Bartender คุณควรทำอย่างไร?",
+                opts: ["ชงให้เข้มขึ้นเพื่อให้หลับเร็วๆ", "ปฏิเสธเสียงแข็งทันที", "เสิร์ฟน้ำเปล่าให้ฟรี หรือแนะนำ Mocktail/Snack อย่างสุภาพ", "เสิร์ฟเหล้าปลอมให้แทน"],
+                a: 2 // Responsible Service
+            },
+            {
+                q: "14. ถ้าวัตถุดิบหมด (เช่น ใบสะระแหน่สำหรับ Mojito หมด) คุณจะบอกลูกค้าอย่างไร?",
+                opts: ["บอกห้วนๆ ว่า 'หมดครับ'", "ทำเงียบๆ โดยไม่ใส่ใบสะระแหน่", "ขอโทษ แจ้งความจริง และแนะนำเมนูอื่นที่มีรสชาติใกล้เคียง (Offer Alternative)", "เดินหนีไปหลังร้าน"],
+                a: 2 // Offer Alternative (Typo Fixed)
+            },
+            {
+                q: "15. ลูกค้าถามว่า 'แนะนำ Cocktail ให้หน่อย' คำถามแรกที่คุณควรตอลกลับคือ?",
+                opts: ["แพงนะครับ ไหวไหม?", "ปกติคุณพี่ชอบรสชาติแนวไหนครับ? (เปรี้ยว/หวาน/เข้ม)", "เอา Long Island เลยครับ เมาคุ้ม", "ผมชอบ Mojito ครับ เอาไหม?"],
+                a: 1 // Asking Preference
             }
         ];
 
-        let currentQuestionIndex = 0;
+        let currentIdx = 0;
         let score = 0;
 
-        const startScreen = document.getElementById('start-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const nextBtn = document.getElementById('next-btn');
-        const progressBar = document.getElementById('progress-bar');
-        const questionNumber = document.getElementById('question-number');
+        const els = {
+            start: document.getElementById('start-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            result: document.getElementById('result-screen'),
+            qText: document.getElementById('question-text'),
+            qNum: document.getElementById('question-number'),
+            opts: document.getElementById('options-container'),
+            next: document.getElementById('next-btn'),
+            bar: document.getElementById('progress-bar'),
+            score: document.getElementById('score-display'),
+            finalScore: document.getElementById('final-score'),
+            feedback: document.getElementById('feedback-text'),
+            feedbackBox: document.getElementById('feedback-box'),
+            resultIcon: document.getElementById('result-icon'),
+            resultTitle: document.getElementById('result-title'),
+            actionBtn: document.getElementById('action-btn'),
+            confetti: document.getElementById('confetti-container')
+        };
 
         function startQuiz() {
-            startScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            quizScreen.classList.add('fade-in');
-            loadQuestion();
+            els.start.classList.add('hidden');
+            els.quiz.classList.remove('hidden');
+            els.quiz.classList.add('fade-in');
+            loadQ();
         }
 
-        function loadQuestion() {
-            const currentQuestion = questions[currentQuestionIndex];
+        function loadQ() {
+            const q = questions[currentIdx];
+            els.qNum.innerText = `Q${currentIdx + 1}/${questions.length}`;
+            els.qText.innerText = q.q;
+            els.bar.style.width = `${((currentIdx) / questions.length) * 100}%`;
+            els.score.innerText = `Score: ${score}`;
             
-            // Update UI
-            questionNumber.innerText = `Question ${currentQuestionIndex + 1}/${questions.length}`;
-            questionText.innerText = currentQuestion.question;
-            progressBar.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
-            
-            // Clear old options
-            optionsContainer.innerHTML = '';
-            nextBtn.classList.add('hidden');
+            els.opts.innerHTML = '';
+            els.next.classList.add('hidden');
 
-            // Generate Options
-            currentQuestion.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.innerText = option;
-                button.className = 'w-full text-left p-4 rounded-xl border border-slate-600 bg-slate-800/50 hover:bg-slate-700 hover:border-gold-500 transition-all text-slate-200 text-lg group';
-                button.onclick = () => selectAnswer(index, button);
-                optionsContainer.appendChild(button);
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl border border-slate-600 bg-slate-800/40 hover:bg-slate-700/80 hover:border-gold-500/50 transition-all text-slate-300 font-light';
+                btn.innerHTML = `<span class="inline-block w-6 h-6 rounded-full border border-slate-500 mr-3 text-center text-xs leading-5 text-slate-500 font-mono">${String.fromCharCode(65+i)}</span> ${opt}`;
+                btn.onclick = () => check(i, btn, q.a);
+                els.opts.appendChild(btn);
             });
         }
 
-        function selectAnswer(selectedIndex, button) {
-            const correctIndex = questions[currentQuestionIndex].correct;
-            const buttons = optionsContainer.getElementsByTagName('button');
+        function check(selected, btn, correct) {
+            const allBtns = els.opts.querySelectorAll('button');
+            allBtns.forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            btn.classList.remove('opacity-50');
 
-            // Lock all buttons
-            for (let btn of buttons) {
-                btn.disabled = true;
-                btn.classList.add('opacity-70', 'cursor-not-allowed');
-            }
-
-            // Check Answer
-            if (selectedIndex === correctIndex) {
+            if (selected === correct) {
                 score++;
-                button.classList.remove('bg-slate-800/50', 'border-slate-600');
-                button.classList.add('bg-green-600', 'border-green-400', 'text-white');
-                button.innerHTML += ' <span class="float-right">✓ Correct</span>';
+                btn.className = 'w-full text-left p-4 rounded-xl border border-green-500 bg-green-900/30 text-white shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all';
+                btn.innerHTML += ' <span class="float-right text-green-400">✓ Correct</span>';
             } else {
-                button.classList.remove('bg-slate-800/50', 'border-slate-600');
-                button.classList.add('bg-red-600', 'border-red-400', 'text-white');
-                // Highlight correct one
-                buttons[correctIndex].classList.remove('bg-slate-800/50', 'border-slate-600');
-                buttons[correctIndex].classList.add('bg-green-600/50', 'border-green-400', 'text-white');
-                buttons[correctIndex].innerHTML += ' <span class="float-right text-xs pt-1">คำตอบที่ถูก</span>';
+                btn.className = 'w-full text-left p-4 rounded-xl border border-red-500 bg-red-900/30 text-white transition-all';
+                allBtns[correct].className = 'w-full text-left p-4 rounded-xl border border-green-500 bg-green-900/30 text-white opacity-100 shadow-[0_0_15px_rgba(34,197,94,0.3)]';
+                allBtns[correct].innerHTML += ' <span class="float-right text-green-400">Answer</span>';
             }
-
-            nextBtn.classList.remove('hidden');
+            els.next.classList.remove('hidden');
         }
 
         function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                loadQuestion();
-            } else {
-                showResult();
+            currentIdx++;
+            if (currentIdx < questions.length) loadQ();
+            else showResult();
+        }
+
+        function createConfetti() {
+            els.confetti.classList.remove('hidden');
+            for(let i=0; i<50; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.backgroundColor = ['#fbbf24', '#f59e0b', '#fff', '#22c55e'][Math.floor(Math.random()*4)];
+                conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                conf.style.animationDelay = (Math.random() * 2) + 's';
+                els.confetti.appendChild(conf);
             }
         }
 
         function showResult() {
-            quizScreen.classList.add('hidden');
-            resultScreen.classList.remove('hidden');
+            els.quiz.classList.add('hidden');
+            els.result.classList.remove('hidden');
+            els.finalScore.innerText = `${score} / ${questions.length}`;
             
-            const finalScoreElement = document.getElementById('final-score');
-            const feedbackText = document.getElementById('feedback-text');
-            
-            finalScoreElement.innerText = `${score} / ${questions.length}`;
-            
-            const percentage = (score / questions.length) * 100;
-            
-            if (percentage >= 80) {
-                feedbackText.innerHTML = `<span class="text-gold-400 font-bold">Excellent!</span><br>คุณมีความรู้พื้นฐานแน่นปึ้ก และมีทัศนคติการบริการที่ยอดเยี่ยม เหมาะสมกับมาตรฐานโรงแรม 5 ดาว`;
-            } else if (percentage >= 50) {
-                feedbackText.innerHTML = `<span class="text-blue-400 font-bold">Good Job.</span><br>คุณมีความรู้พื้นฐานดี แต่อาจต้องทบทวนเรื่อง Standard Drink และเทคนิคการบริการเพิ่มเติมอีกนิด`;
+            // Logic: ถ้าได้คะแนนมากกว่า 10 (11, 12, 13, 14, 15)
+            if (score > 10) {
+                // SUCCESS STATE: HIRED!
+                createConfetti();
+                
+                els.resultIcon.innerHTML = `
+                    <div class="w-24 h-24 rounded-full bg-green-600 border-4 border-green-400 flex items-center justify-center text-white shadow-[0_0_30px_rgba(34,197,94,0.6)] animate-bounce-slow">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>`;
+                
+                els.resultTitle.innerHTML = `<span class="text-gold-400">CONGRATULATIONS!</span>`;
+                
+                els.feedbackBox.className = "p-6 rounded-2xl mb-8 max-w-md mx-auto leading-relaxed border border-gold-500 bg-gold-900/20 shadow-lg transform scale-105";
+                
+                els.feedback.innerHTML = `
+                    <p class="text-2xl font-bold text-white mb-2">YOU ARE HIRED!</p>
+                    <p class="text-slate-300 text-sm">ยินดีด้วย! คุณมีความรู้และทัศนคติที่ยอดเยี่ยม ตรงตามมาตรฐานโรงแรม 5 ดาว</p>
+                    <p class="mt-4 text-gold-400 font-bold border-t border-gold-500/30 pt-4">Welcome to the Team.</p>
+                `;
+
+                els.actionBtn.innerText = "Report for Duty";
+                els.actionBtn.className = "px-10 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold rounded-xl shadow-lg transition-transform transform hover:scale-105";
+                
             } else {
-                feedbackText.innerHTML = `<span class="text-red-400 font-bold">Needs Improvement.</span><br>แนะนำให้ศึกษาสูตรพื้นฐาน (Classic Cocktails) และประเภทของเหล้าเพิ่มเติมก่อนเริ่มงานจริง`;
+                // FAIL STATE
+                els.resultIcon.innerHTML = `
+                    <div class="w-20 h-20 rounded-full bg-slate-700 border-2 border-slate-500 flex items-center justify-center text-slate-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>`;
+                
+                els.feedback.innerHTML = `
+                    <span class='text-red-400 font-bold text-xl'>We're sorry.</span><br>
+                    คะแนนของคุณยังไม่ถึงเกณฑ์มาตรฐานโรงแรม 5 ดาวของเรา <br>
+                    <span class="text-xs text-slate-500 mt-2 block">(ต้องการ 11 คะแนนขึ้นไปเพื่อผ่านการคัดเลือก)</span>
+                `;
             }
         }
     </script>
