@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bar Master Interview Quiz (Final)</title>
+    <title>Bar Sorting Game: Cocktail or Spirit?</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,7 +11,9 @@
                 extend: {
                     colors: {
                         gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
-                        dark: { 800: '#1e293b', 900: '#0f172a' }
+                        dark: { 800: '#1e293b', 900: '#0f172a' },
+                        spirit: '#3b82f6', // Blue for Spirits
+                        cocktail: '#f59e0b' // Gold for Cocktails
                     },
                     fontFamily: {
                         'serif': ['Playfair Display', 'serif'],
@@ -19,6 +21,20 @@
                     },
                     animation: {
                         'bounce-slow': 'bounce 3s infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'pop': 'pop 0.3s ease-out'
+                    },
+                    keyframes: {
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        pop: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
                     }
                 }
             }
@@ -26,17 +42,14 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; touch-action: manipulation; }
         h1, h2, .font-serif { font-family: 'Playfair Display', serif; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Confetti effect class */
+        
+        .card-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
+        
+        /* Confetti */
         .confetti {
-            position: absolute;
-            width: 10px; height: 10px;
+            position: absolute; width: 10px; height: 10px;
             background-color: #f59e0b;
             animation: confetti-fall 3s linear infinite;
         }
@@ -46,293 +59,240 @@
         }
     </style>
 </head>
-<body class="bg-dark-900 text-slate-200 min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-fixed overflow-hidden">
+<body class="bg-dark-900 text-slate-200 min-h-screen flex flex-col items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1551024709-8f23befc6f87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-fixed overflow-hidden select-none">
 
     <div class="absolute inset-0 bg-black/80 z-0"></div>
-
     <div id="confetti-container" class="absolute inset-0 pointer-events-none hidden z-20"></div>
 
-    <div class="relative z-10 w-full max-w-2xl bg-dark-800/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden p-6 md:p-10 fade-in flex flex-col min-h-[600px]">
+    <div class="relative z-10 mb-6 text-center">
+        <p class="text-gold-500 text-xs tracking-[0.3em] uppercase mb-1">Speed Test</p>
+        <h1 class="text-3xl text-white font-bold tracking-wide">Bar Sorting Game</h1>
+    </div>
+
+    <div id="start-screen" class="relative z-10 w-full max-w-md bg-dark-800/90 backdrop-blur-xl border border-slate-700 rounded-3xl p-8 text-center card-shadow animate-pop">
+        <div class="mb-6">
+            <div class="w-20 h-20 bg-slate-700 rounded-full mx-auto flex items-center justify-center text-3xl">
+                🍸
+            </div>
+        </div>
+        <h2 class="text-2xl text-white mb-4">แยกประเภทให้ถูกต้อง</h2>
+        <p class="text-slate-400 mb-8">
+            มีรายการทั้งหมด 15 คำ <br>
+            คุณแค่ต้องแยกว่าคำนี้คือ <br>
+            <strong class="text-spirit">"เหล้า (Spirit)"</strong> หรือ <strong class="text-cocktail">"ค็อกเทล (Cocktail)"</strong>
+        </p>
+        <button onclick="startGame()" class="w-full py-4 bg-white text-dark-900 font-bold rounded-2xl shadow-lg hover:scale-105 transition-transform text-lg">
+            เริ่มเกมทันที
+        </button>
+    </div>
+
+    <div id="game-screen" class="hidden relative z-10 w-full max-w-md flex flex-col h-[500px]">
         
-        <div class="text-center mb-6 border-b border-slate-600 pb-4 shrink-0">
-            <p class="text-gold-500 text-xs md:text-sm tracking-[0.2em] uppercase mb-2">Exclusive Recruitment</p>
-            <h1 class="text-2xl md:text-4xl font-bold text-white tracking-wide font-serif">Professional Bar Quiz</h1>
+        <div class="flex justify-between items-center mb-4 px-2">
+            <div class="w-full bg-slate-700 rounded-full h-2 mr-4">
+                <div id="progress-bar" class="bg-white h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <span id="score-display" class="font-mono text-gold-400 font-bold text-xl">0</span>
         </div>
 
-        <div id="start-screen" class="flex-grow flex flex-col justify-center items-center text-center space-y-8">
-            <div class="space-y-4">
-                <p class="text-lg text-slate-300">
-                    แบบทดสอบวัดระดับ Bar & Service Standards <br>
-                    เพื่อคัดเลือกพนักงานเข้าสู่ทีมระดับ 5 ดาว
-                </p>
-                <div class="flex justify-center gap-4">
-                    <div class="px-4 py-2 bg-slate-700 rounded-lg border border-slate-600">
-                        <span class="block text-2xl font-bold text-gold-400">15</span>
-                        <span class="text-xs text-slate-400">Questions</span>
-                    </div>
-                    <div class="px-4 py-2 bg-slate-700 rounded-lg border border-slate-600">
-                        <span class="block text-2xl font-bold text-gold-400">Hard</span>
-                        <span class="text-xs text-slate-400">Difficulty</span>
-                    </div>
-                </div>
-            </div>
-            <button onclick="startQuiz()" class="w-full md:w-2/3 py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-dark-900 font-bold rounded-xl shadow-lg transition-transform transform hover:scale-105">
-                Start Interview Test
+        <div id="card-container" class="flex-grow bg-dark-800/90 backdrop-blur-md border border-slate-600 rounded-3xl flex flex-col items-center justify-center p-8 mb-6 card-shadow transition-all duration-200 transform">
+            <p class="text-slate-400 text-sm uppercase tracking-widest mb-4">Item <span id="current-index">1</span>/15</p>
+            <h2 id="item-name" class="text-4xl md:text-5xl font-serif text-white font-bold text-center leading-tight drop-shadow-lg">
+                Loading...
+            </h2>
+            <p id="item-thai" class="text-slate-500 mt-2 text-lg font-light"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 h-24">
+            <button onclick="answer('spirit')" class="group relative bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 hover:border-blue-400 rounded-2xl transition-all active:scale-95 flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🍾</span>
+                <span class="font-bold text-slate-300 group-hover:text-white">SPIRIT</span>
+                <span class="text-xs text-slate-500">(เหล้าขวด/ส่วนผสม)</span>
             </button>
-        </div>
-
-        <div id="quiz-screen" class="hidden flex flex-col h-full">
-            <div class="w-full bg-slate-700 rounded-full h-1.5 mb-6 shrink-0">
-                <div id="progress-bar" class="bg-gold-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-
-            <div class="mb-6 shrink-0">
-                <div class="flex justify-between items-end mb-2">
-                    <span id="question-number" class="text-gold-500 text-sm font-semibold">Q1</span>
-                    <span id="score-display" class="text-slate-500 text-xs">Score: 0</span>
-                </div>
-                <h2 id="question-text" class="text-xl md:text-2xl font-serif text-white leading-relaxed">Loading...</h2>
-            </div>
-
-            <div id="options-container" class="grid gap-3 overflow-y-auto pr-1 pb-2 grow content-start">
-                </div>
-
-            <button id="next-btn" onclick="nextQuestion()" class="hidden w-full mt-4 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-xl transition-colors shrink-0">
-                Next Question &rarr;
-            </button>
-        </div>
-
-        <div id="result-screen" class="hidden flex-grow flex flex-col justify-center items-center text-center fade-in">
-            <div id="result-icon" class="mb-6 mx-auto transition-all duration-500"></div>
             
-            <h2 id="result-title" class="text-3xl font-serif text-white mb-2">Interview Result</h2>
-            <div class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-gold-400 to-gold-600 mb-4" id="final-score">0/15</div>
-            
-            <div id="feedback-box" class="p-6 rounded-2xl mb-8 max-w-md mx-auto leading-relaxed border border-transparent transition-all">
-                <div id="feedback-text" class="text-slate-300"></div>
-            </div>
-
-            <button onclick="location.reload()" id="action-btn" class="px-8 py-3 border border-slate-500 hover:border-gold-500 text-slate-300 hover:text-white rounded-full transition-all">
-                Retake Quiz
+            <button onclick="answer('cocktail')" class="group relative bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 hover:border-gold-500 rounded-2xl transition-all active:scale-95 flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🍹</span>
+                <span class="font-bold text-slate-300 group-hover:text-white">COCKTAIL</span>
+                <span class="text-xs text-slate-500">(เมนูเครื่องดื่ม)</span>
             </button>
         </div>
     </div>
 
-    <script>
-        const questions = [
-            // --- Product Knowledge: Cocktails ---
-            {
-                q: "1. 'Mojito' มีต้นกำเนิดจากคิวบา ส่วนผสมหลักคือเหล้าชนิดใด?",
-                opts: ["Vodka", "Gin", "Rum", "Tequila"],
-                a: 2 // Rum
-            },
-            {
-                q: "2. 'Margarita' ต้องเสิร์ฟโดยมีการทำ Rim (เคลือบขอบแก้ว) ด้วยอะไร?",
-                opts: ["น้ำตาลทราย", "เกลือ", "ผงโกโก้", "พริกเกลือ"],
-                a: 1 // Salt
-            },
-            {
-                q: "3. 'Cosmopolitan' เป็นค็อกเทลสีชมพูสวยงาม เกิดจากส่วนผสมของ Vodka กับน้ำผลไม้อะไร?",
-                opts: ["น้ำส้ม (Orange)", "น้ำแครนเบอร์รี่ (Cranberry)", "น้ำทับทิม (Pomegranate)", "น้ำสตรอว์เบอร์รี่ (Strawberry)"],
-                a: 1 // Cranberry
-            },
-            {
-                q: "4. 'Piña Colada' (พีน่า โคลาด้า) ให้รสชาติแบบ Tropical ส่วนผสมหลักคือ Rum, กะทิ และ...?",
-                opts: ["น้ำสับปะรด", "น้ำมะนาว", "น้ำเชื่อมกลิ่นส้ม", "โซดา"],
-                a: 0 // Pineapple Juice
-            },
-            {
-                q: "5. 'Bloody Mary' เป็นค็อกเทลแนว Savory (คาว) มักใช้อะไรเป็นตัวชูรสชาติ?",
-                opts: ["น้ำเชื่อม", "นมสด", "ซอสทาบาสโก้ และ วูสเตอร์ซอส", "น้ำผึ้ง"],
-                a: 2 // Tabasco/Worcestershire
-            },
-            {
-                q: "6. 'Long Island Iced Tea' ขึ้นชื่อเรื่องความแรง เพราะใช้ Base Spirit ถึงกี่ชนิดรวมกัน?",
-                opts: ["2 ชนิด", "3 ชนิด", "4-5 ชนิด", "ชนิดเดียวแต่ใส่เยอะ"],
-                a: 2 // 4-5 spirits
-            },
-            
-            // --- Product Knowledge: Spirits (Base & Liqueur) ---
-            {
-                q: "7. 'Gin' (จิน) มีกลิ่นหอมเอกลักษณ์เฉพาะตัว กลิ่นนั้นมาจากผลของพืชชนิดใด?",
-                opts: ["องุ่น (Grape)", "จูนิเปอร์เบอร์รี่ (Juniper Berry)", "ข้าวบาร์เลย์ (Barley)", "อ้อย (Sugarcane)"],
-                a: 1 // Juniper
-            },
-            {
-                q: "8. 'Brandy' (บรั่นดี) มักทำมาจากการหมักและกลั่นผลไม้อะไรเป็นหลัก?",
-                opts: ["ข้าวเจ้า", "มันฝรั่ง", "องุ่น", "ข้าวโพด"],
-                a: 2 // Grapes
-            },
-            {
-                q: "9. ในภาพมีคำว่า 'Liqueur' (ลิเคียว) สิ่งนี้คืออะไร?",
-                opts: ["เหล้ากลั่นบริสุทธิ์ ดีกรีสูง", "เหล้าหวาน ที่มีการแต่งกลิ่น สี และรสชาติ", "ไวน์ชนิดหนึ่ง", "ชื่อยี่ห้อเหล้า"],
-                a: 1 // Sweetened spirits
-            },
-            {
-                q: "10. หากลูกค้าสั่ง 'Old Fashioned' เหล้า Base Spirit ที่ถูกต้องตามต้นตำรับคืออะไร?",
-                opts: ["Vodka", "Gin", "Whisky / Bourbon", "Rum"],
-                a: 2 // Whisky
-            },
+    <div id="result-screen" class="hidden relative z-10 w-full max-w-md bg-dark-800/95 backdrop-blur-xl border border-slate-700 rounded-3xl p-8 text-center card-shadow animate-pop">
+        <div id="result-icon" class="mb-6 mx-auto transition-all"></div>
+        
+        <h2 id="result-title" class="text-3xl font-serif text-white mb-2">Result</h2>
+        <div class="text-6xl font-bold text-white mb-4" id="final-score">0</div>
+        
+        <div id="feedback-box" class="p-4 rounded-xl mb-8 border border-transparent">
+            <p id="feedback-text" class="text-slate-300"></p>
+        </div>
 
-            // --- 5-Star Service Standards & Skill ---
-            {
-                q: "11. 'Martini' โดยปกติแล้วต้องใช้วิธี Stir (คน) เหตุผลหลักคืออะไร?",
-                opts: ["เพื่อให้เย็นเร็วที่สุด", "เพื่อให้ได้ฟองนุ่มๆ", "เพื่อให้เครื่องดื่มใสดุจคริสตัล (Crystal Clear)", "เพื่อให้น้ำแข็งละลายเยอะๆ"],
-                a: 2 // Clarity
-            },
-            {
-                q: "12. ลูกค้าสั่ง 'Whisky On the Rocks' มาตรฐานโรงแรม 5 ดาว ควรเสิร์ฟอย่างไร?",
-                opts: ["ใส่น้ำแข็งป่นให้เต็มแก้ว", "ใส่น้ำแข็งก้อนใหญ่ (Ice Ball/Cube) ก้อนเดียว", "ใส่น้ำแข็งหลอด", "ไม่ต้องใส่น้ำแข็ง เสิร์ฟแยก"],
-                a: 1 // Ice Ball
-            },
-            {
-                q: "13. หากลูกค้าเริ่มเมาและสั่งเครื่องดื่มเพิ่ม ในฐานะ Bartender คุณควรทำอย่างไร?",
-                opts: ["ชงให้เข้มขึ้นเพื่อให้หลับเร็วๆ", "ปฏิเสธเสียงแข็งทันที", "เสิร์ฟน้ำเปล่าให้ฟรี หรือแนะนำ Mocktail/Snack อย่างสุภาพ", "เสิร์ฟเหล้าปลอมให้แทน"],
-                a: 2 // Responsible Service
-            },
-            {
-                q: "14. ถ้าวัตถุดิบหมด (เช่น ใบสะระแหน่สำหรับ Mojito หมด) คุณจะบอกลูกค้าอย่างไร?",
-                opts: ["บอกห้วนๆ ว่า 'หมดครับ'", "ทำเงียบๆ โดยไม่ใส่ใบสะระแหน่", "ขอโทษ แจ้งความจริง และแนะนำเมนูอื่นที่มีรสชาติใกล้เคียง (Offer Alternative)", "เดินหนีไปหลังร้าน"],
-                a: 2 // Offer Alternative (Typo Fixed)
-            },
-            {
-                q: "15. ลูกค้าถามว่า 'แนะนำ Cocktail ให้หน่อย' คำถามแรกที่คุณควรตอลกลับคือ?",
-                opts: ["แพงนะครับ ไหวไหม?", "ปกติคุณพี่ชอบรสชาติแนวไหนครับ? (เปรี้ยว/หวาน/เข้ม)", "เอา Long Island เลยครับ เมาคุ้ม", "ผมชอบ Mojito ครับ เอาไหม?"],
-                a: 1 // Asking Preference
-            }
+        <button onclick="location.reload()" id="action-btn" class="w-full py-4 border border-slate-500 text-slate-300 rounded-xl hover:bg-slate-700 hover:text-white transition-all font-semibold">
+            เล่นใหม่อีกครั้ง
+        </button>
+    </div>
+
+    <script>
+        // ข้อมูล 15 ตัวจากในรูป ครบถ้วน
+        const items = [
+            // Spirits (7 items)
+            { name: "Vodka", thai: "วอดก้า", type: "spirit" },
+            { name: "Rum", thai: "รัม", type: "spirit" },
+            { name: "Gin", thai: "จิน", type: "spirit" },
+            { name: "Whisky", thai: "วิสกี้", type: "spirit" },
+            { name: "Brandy", thai: "บรั่นดี", type: "spirit" },
+            { name: "Tequila", thai: "เตกีล่า", type: "spirit" },
+            { name: "Liqueur", thai: "ลิเคียว / เหล้าหวาน", type: "spirit" },
+            
+            // Cocktails (8 items)
+            { name: "Mojito", thai: "โมฮิโต้", type: "cocktail" },
+            { name: "Margarita", thai: "มาร์การิต้า", type: "cocktail" },
+            { name: "Martini", thai: "มาร์ตินี่", type: "cocktail" },
+            { name: "Old Fashioned", thai: "โอลด์ แฟชั่น", type: "cocktail" },
+            { name: "Cosmopolitan", thai: "คอสโมโพลิแทน", type: "cocktail" },
+            { name: "Piña Colada", thai: "พีน่า โคลาด้า", type: "cocktail" },
+            { name: "Long Island", thai: "ลอง ไอส์แลนด์", type: "cocktail" },
+            { name: "Bloody Mary", thai: "บลัดดี้ แมรี่", type: "cocktail" }
         ];
 
-        let currentIdx = 0;
-        let score = 0;
+        // Shuffle Items function
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-        const els = {
+        let gameItems = [];
+        let currentIndex = 0;
+        let score = 0;
+        let canClick = true;
+
+        const screens = {
             start: document.getElementById('start-screen'),
-            quiz: document.getElementById('quiz-screen'),
-            result: document.getElementById('result-screen'),
-            qText: document.getElementById('question-text'),
-            qNum: document.getElementById('question-number'),
-            opts: document.getElementById('options-container'),
-            next: document.getElementById('next-btn'),
-            bar: document.getElementById('progress-bar'),
-            score: document.getElementById('score-display'),
-            finalScore: document.getElementById('final-score'),
-            feedback: document.getElementById('feedback-text'),
-            feedbackBox: document.getElementById('feedback-box'),
-            resultIcon: document.getElementById('result-icon'),
-            resultTitle: document.getElementById('result-title'),
-            actionBtn: document.getElementById('action-btn'),
-            confetti: document.getElementById('confetti-container')
+            game: document.getElementById('game-screen'),
+            result: document.getElementById('result-screen')
         };
 
-        function startQuiz() {
-            els.start.classList.add('hidden');
-            els.quiz.classList.remove('hidden');
-            els.quiz.classList.add('fade-in');
-            loadQ();
+        const ui = {
+            name: document.getElementById('item-name'),
+            thai: document.getElementById('item-thai'),
+            index: document.getElementById('current-index'),
+            bar: document.getElementById('progress-bar'),
+            score: document.getElementById('score-display'),
+            card: document.getElementById('card-container')
+        };
+
+        function startGame() {
+            gameItems = shuffle([...items]); // Shuffle every time
+            currentIndex = 0;
+            score = 0;
+            screens.start.classList.add('hidden');
+            screens.game.classList.remove('hidden');
+            renderCard();
         }
 
-        function loadQ() {
-            const q = questions[currentIdx];
-            els.qNum.innerText = `Q${currentIdx + 1}/${questions.length}`;
-            els.qText.innerText = q.q;
-            els.bar.style.width = `${((currentIdx) / questions.length) * 100}%`;
-            els.score.innerText = `Score: ${score}`;
-            
-            els.opts.innerHTML = '';
-            els.next.classList.add('hidden');
-
-            q.opts.forEach((opt, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-4 rounded-xl border border-slate-600 bg-slate-800/40 hover:bg-slate-700/80 hover:border-gold-500/50 transition-all text-slate-300 font-light';
-                btn.innerHTML = `<span class="inline-block w-6 h-6 rounded-full border border-slate-500 mr-3 text-center text-xs leading-5 text-slate-500 font-mono">${String.fromCharCode(65+i)}</span> ${opt}`;
-                btn.onclick = () => check(i, btn, q.a);
-                els.opts.appendChild(btn);
-            });
-        }
-
-        function check(selected, btn, correct) {
-            const allBtns = els.opts.querySelectorAll('button');
-            allBtns.forEach(b => {
-                b.disabled = true;
-                b.classList.add('opacity-50', 'cursor-not-allowed');
-            });
-            btn.classList.remove('opacity-50');
-
-            if (selected === correct) {
-                score++;
-                btn.className = 'w-full text-left p-4 rounded-xl border border-green-500 bg-green-900/30 text-white shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all';
-                btn.innerHTML += ' <span class="float-right text-green-400">✓ Correct</span>';
-            } else {
-                btn.className = 'w-full text-left p-4 rounded-xl border border-red-500 bg-red-900/30 text-white transition-all';
-                allBtns[correct].className = 'w-full text-left p-4 rounded-xl border border-green-500 bg-green-900/30 text-white opacity-100 shadow-[0_0_15px_rgba(34,197,94,0.3)]';
-                allBtns[correct].innerHTML += ' <span class="float-right text-green-400">Answer</span>';
+        function renderCard() {
+            if (currentIndex >= gameItems.length) {
+                endGame();
+                return;
             }
-            els.next.classList.remove('hidden');
+            
+            const item = gameItems[currentIndex];
+            ui.name.innerText = item.name;
+            ui.thai.innerText = item.thai;
+            ui.index.innerText = currentIndex + 1;
+            ui.bar.style.width = `${(currentIndex / gameItems.length) * 100}%`;
+            
+            // Reset Card Style
+            ui.card.className = "flex-grow bg-dark-800/90 backdrop-blur-md border border-slate-600 rounded-3xl flex flex-col items-center justify-center p-8 mb-6 card-shadow transition-all duration-200 transform";
+            canClick = true;
         }
 
-        function nextQuestion() {
-            currentIdx++;
-            if (currentIdx < questions.length) loadQ();
-            else showResult();
+        function answer(userChoice) {
+            if (!canClick) return;
+            canClick = false;
+
+            const item = gameItems[currentIndex];
+            const isCorrect = item.type === userChoice;
+
+            if (isCorrect) {
+                score++;
+                ui.score.innerText = score;
+                // Green Flash
+                ui.card.classList.remove('border-slate-600', 'bg-dark-800/90');
+                ui.card.classList.add('border-green-500', 'bg-green-900/40', 'scale-105');
+                ui.name.innerHTML += ' <span class="text-green-400 text-2xl">✓</span>';
+            } else {
+                // Red Shake
+                ui.card.classList.remove('border-slate-600', 'bg-dark-800/90');
+                ui.card.classList.add('border-red-500', 'bg-red-900/40', 'animate-shake');
+                ui.name.innerHTML += ' <span class="text-red-400 text-2xl">✗</span>';
+                
+                // Show correct type underneath
+                ui.thai.innerHTML = `<span class="text-red-300 font-bold">ผิด! มันคือ ${item.type.toUpperCase()}</span>`;
+            }
+
+            // Auto advance
+            setTimeout(() => {
+                currentIndex++;
+                renderCard();
+            }, 800); // Wait 0.8s before next
+        }
+
+        function endGame() {
+            screens.game.classList.add('hidden');
+            screens.result.classList.remove('hidden');
+            
+            const els = {
+                score: document.getElementById('final-score'),
+                title: document.getElementById('result-title'),
+                text: document.getElementById('feedback-text'),
+                box: document.getElementById('feedback-box'),
+                icon: document.getElementById('result-icon'),
+                btn: document.getElementById('action-btn'),
+                confetti: document.getElementById('confetti-container')
+            };
+
+            els.score.innerText = `${score} / ${gameItems.length}`;
+
+            // Logic: ถ้าได้คะแนน 12 ขึ้นไป (ผิดได้ไม่เกิน 3 ข้อ)
+            if (score >= 12) {
+                // SUCCESS
+                createConfetti();
+                els.title.innerHTML = "<span class='text-gold-400'>YOU ARE HIRED!</span>";
+                els.icon.innerHTML = `
+                    <div class="w-24 h-24 rounded-full bg-green-600 border-4 border-green-400 flex items-center justify-center text-white shadow-[0_0_30px_rgba(34,197,94,0.6)] animate-bounce-slow">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                    </div>`;
+                els.box.className = "p-6 rounded-2xl mb-8 border border-gold-500 bg-gold-900/20 shadow-lg";
+                els.text.innerHTML = "ยินดีด้วย! คุณแยกประเภทเหล้าและค็อกเทลได้แม่นยำมาก <br><strong class='text-white'>พร้อมเริ่มงานทันที!</strong>";
+                
+                els.btn.innerText = "รายงานตัว (Report for Duty)";
+                els.btn.className = "w-full py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform";
+            } else {
+                // FAIL
+                els.icon.innerHTML = `
+                    <div class="w-20 h-20 rounded-full bg-slate-700 border-2 border-slate-500 flex items-center justify-center text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </div>`;
+                els.text.innerHTML = "ยังสับสนอยู่นิดหน่อยนะ <br>ลองกลับไปทบทวนแล้วมาสอบใหม่ครับ";
+            }
         }
 
         function createConfetti() {
-            els.confetti.classList.remove('hidden');
+            const container = document.getElementById('confetti-container');
+            container.classList.remove('hidden');
             for(let i=0; i<50; i++) {
                 const conf = document.createElement('div');
                 conf.className = 'confetti';
                 conf.style.left = Math.random() * 100 + '%';
-                conf.style.backgroundColor = ['#fbbf24', '#f59e0b', '#fff', '#22c55e'][Math.floor(Math.random()*4)];
+                conf.style.backgroundColor = ['#fbbf24', '#3b82f6', '#fff'][Math.floor(Math.random()*3)];
                 conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                conf.style.animationDelay = (Math.random() * 2) + 's';
-                els.confetti.appendChild(conf);
-            }
-        }
-
-        function showResult() {
-            els.quiz.classList.add('hidden');
-            els.result.classList.remove('hidden');
-            els.finalScore.innerText = `${score} / ${questions.length}`;
-            
-            // Logic: ถ้าได้คะแนนมากกว่า 10 (11, 12, 13, 14, 15)
-            if (score > 10) {
-                // SUCCESS STATE: HIRED!
-                createConfetti();
-                
-                els.resultIcon.innerHTML = `
-                    <div class="w-24 h-24 rounded-full bg-green-600 border-4 border-green-400 flex items-center justify-center text-white shadow-[0_0_30px_rgba(34,197,94,0.6)] animate-bounce-slow">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>`;
-                
-                els.resultTitle.innerHTML = `<span class="text-gold-400">CONGRATULATIONS!</span>`;
-                
-                els.feedbackBox.className = "p-6 rounded-2xl mb-8 max-w-md mx-auto leading-relaxed border border-gold-500 bg-gold-900/20 shadow-lg transform scale-105";
-                
-                els.feedback.innerHTML = `
-                    <p class="text-2xl font-bold text-white mb-2">YOU ARE HIRED!</p>
-                    <p class="text-slate-300 text-sm">ยินดีด้วย! คุณมีความรู้และทัศนคติที่ยอดเยี่ยม ตรงตามมาตรฐานโรงแรม 5 ดาว</p>
-                    <p class="mt-4 text-gold-400 font-bold border-t border-gold-500/30 pt-4">Welcome to the Team.</p>
-                `;
-
-                els.actionBtn.innerText = "Report for Duty";
-                els.actionBtn.className = "px-10 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold rounded-xl shadow-lg transition-transform transform hover:scale-105";
-                
-            } else {
-                // FAIL STATE
-                els.resultIcon.innerHTML = `
-                    <div class="w-20 h-20 rounded-full bg-slate-700 border-2 border-slate-500 flex items-center justify-center text-slate-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                    </div>`;
-                
-                els.feedback.innerHTML = `
-                    <span class='text-red-400 font-bold text-xl'>We're sorry.</span><br>
-                    คะแนนของคุณยังไม่ถึงเกณฑ์มาตรฐานโรงแรม 5 ดาวของเรา <br>
-                    <span class="text-xs text-slate-500 mt-2 block">(ต้องการ 11 คะแนนขึ้นไปเพื่อผ่านการคัดเลือก)</span>
-                `;
+                conf.style.animationDelay = (Math.random() * 1) + 's';
+                container.appendChild(conf);
             }
         }
     </script>
